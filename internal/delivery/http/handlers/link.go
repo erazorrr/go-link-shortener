@@ -23,7 +23,7 @@ func (handler *LinkHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	link, err := handler.linkCommandService.CreateLink(r.Context(), body.Link.Url, body.Link.ExpiresAt)
+	link, err := handler.linkCommandService.CreateLink(r.Context(), body.Link.URL, body.Link.ExpiresAt)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

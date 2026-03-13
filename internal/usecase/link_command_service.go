@@ -41,7 +41,7 @@ func randomCode() string {
 func (service *LinkCommandService) CreateLink(ctx context.Context, url string, expiresAt *time.Time) (*domain.Link, error) {
 	link := domain.Link{
 		Code:      randomCode(),
-		Url:       url,
+		URL:       url,
 		ExpiresAt: expiresAt,
 	}
 	err := service.linkRepository.CreateLink(ctx, &link)

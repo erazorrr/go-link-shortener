@@ -24,5 +24,5 @@ const createLinkQuery = `
 `
 
 func (repository *LinkRepository) CreateLink(ctx context.Context, link *domain.Link) error {
-	return repository.dbPool.QueryRow(ctx, createLinkQuery, link.Code, link.Url, link.ExpiresAt).Scan(&link.Id, &link.CreatedAt)
+	return repository.dbPool.QueryRow(ctx, createLinkQuery, link.Code, link.URL, link.ExpiresAt).Scan(&link.ID, &link.CreatedAt)
 }

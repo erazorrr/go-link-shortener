@@ -7,9 +7,9 @@ import (
 )
 
 type LinkDTO struct {
-	Id        int64      `json:"id" required:"true"`
+	ID        int64      `json:"id" required:"true"`
 	Code      string     `json:"code" required:"true"`
-	Url       string     `json:"url" required:"true"`
+	URL       string     `json:"url" required:"true"`
 	CreatedAt *time.Time `json:"created_at" required:"true"`
 	ExpiresAt *time.Time `json:"expires_at"`
 }
@@ -21,9 +21,9 @@ type LinkCreatedDTO struct {
 func NewLinkCreatedDTO(link *domain.Link) *LinkCreatedDTO {
 	return &LinkCreatedDTO{
 		Link: LinkDTO{
-			Id:        link.Id,
+			ID:        link.ID,
 			Code:      link.Code,
-			Url:       link.Url,
+			URL:       link.URL,
 			CreatedAt: link.CreatedAt,
 			ExpiresAt: link.ExpiresAt,
 		},
