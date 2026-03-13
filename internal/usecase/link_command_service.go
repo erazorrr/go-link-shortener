@@ -38,12 +38,22 @@ func randomCode() string {
 	return string(result)
 }
 
+const codeCollisionRetries = 3
+
 func (service *LinkCommandService) CreateLink(ctx context.Context, url string, expiresAt *time.Time) (*domain.Link, error) {
 	link := domain.Link{
 		Code:      randomCode(),
 		URL:       url,
 		ExpiresAt: expiresAt,
 	}
-	err := service.linkRepository.CreateLink(ctx, &link)
+
+	var err error
+	for range codeCollisionRetries {
+		err = service.linkRepository.CreateLink(ctx, &link)
+		if err == nil {
+			break
+		}
+	}
+
 	return &link, err
 }
