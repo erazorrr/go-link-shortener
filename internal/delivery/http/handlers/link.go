@@ -16,9 +16,13 @@ func NewLinkHandler(linkCommandService *usecase.LinkCommandService) *LinkHandler
 	return &LinkHandler{linkCommandService: linkCommandService}
 }
 
+const maxRequestBodySizeBytes = 1 << 20
+
 func (handler *LinkHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var body LinkCreateDTO
-	err := json.NewDecoder(r.Body).Decode(&body)
+	decoder := json.NewDecoder(http.MaxBytesReader(w, r.Body, maxRequestBodySizeBytes))
+	decoder.DisallowUnknownFields()
+	err := decoder.Decode(&body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
