@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 
@@ -29,7 +30,14 @@ func (handler *LinkHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	var buf bytes.Buffer
 	response := NewLinkCreatedDTO(link)
-	json.NewEncoder(w).Encode(response)
+	err = json.NewEncoder(&buf).Encode(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write(buf.Bytes())
 }
