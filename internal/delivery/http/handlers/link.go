@@ -5,14 +5,14 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/erazorrr/go-link-shortener/internal/usercase"
+	"github.com/erazorrr/go-link-shortener/internal/usecase"
 )
 
 type LinkHandler struct {
-	linkCommandService *usercase.LinkCommandService
+	linkCommandService *usecase.LinkCommandService
 }
 
-func NewLinkHandler(linkCommandService *usercase.LinkCommandService) *LinkHandler {
+func NewLinkHandler(linkCommandService *usecase.LinkCommandService) *LinkHandler {
 	return &LinkHandler{linkCommandService: linkCommandService}
 }
 
