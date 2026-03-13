@@ -38,7 +38,7 @@ func randomCode() string {
 	return string(result)
 }
 
-func (service *LinkCommandService) CreateLink(ctx context.Context, url string, expiresAt time.Time) (*domain.Link, error) {
+func (service *LinkCommandService) CreateLink(ctx context.Context, url string, expiresAt *time.Time) (*domain.Link, error) {
 	link := domain.Link{
 		Code:      randomCode(),
 		Url:       url,

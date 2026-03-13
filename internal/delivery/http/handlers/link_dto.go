@@ -7,11 +7,11 @@ import (
 )
 
 type LinkDTO struct {
-	Id        int64     `json:"id" required:"true"`
-	Code      string    `json:"code" required:"true"`
-	Url       string    `json:"url" required:"true"`
-	CreatedAt time.Time `json:"created_at" required:"true"`
-	ExpiresAt time.Time `json:"expires_at" required:"true"`
+	Id        int64      `json:"id" required:"true"`
+	Code      string     `json:"code" required:"true"`
+	Url       string     `json:"url" required:"true"`
+	CreatedAt *time.Time `json:"created_at" required:"true"`
+	ExpiresAt *time.Time `json:"expires_at"`
 }
 
 type LinkCreatedDTO struct {
