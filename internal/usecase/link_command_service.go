@@ -26,16 +26,16 @@ const (
 	charset    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
-func randomCode() string {
+func randomCode() (string, error) {
 	result := make([]byte, codeLength)
 	for i := range codeLength {
 		index, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
 		if err != nil {
-			panic(err)
+			return "", err
 		}
 		result[i] = charset[int(index.Int64())]
 	}
-	return string(result)
+	return string(result), nil
 }
 
 const codeCollisionRetries = 3
@@ -49,7 +49,10 @@ func (service *LinkCommandService) CreateLink(ctx context.Context, url string, e
 
 	var err error
 	for range codeCollisionRetries {
-		link.Code = randomCode()
+		link.Code, err = randomCode()
+		if err != nil {
+			return nil, err
+		}
 		err = service.linkRepository.CreateLink(ctx, &link)
 		if err == nil {
 			break
