@@ -42,13 +42,14 @@ const codeCollisionRetries = 3
 
 func (service *LinkCommandService) CreateLink(ctx context.Context, url string, expiresAt *time.Time) (*domain.Link, error) {
 	link := domain.Link{
-		Code:      randomCode(),
+		Code:      "",
 		URL:       url,
 		ExpiresAt: expiresAt,
 	}
 
 	var err error
 	for range codeCollisionRetries {
+		link.Code = randomCode()
 		err = service.linkRepository.CreateLink(ctx, &link)
 		if err == nil {
 			break
