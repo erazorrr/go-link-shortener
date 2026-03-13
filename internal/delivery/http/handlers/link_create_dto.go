@@ -4,7 +4,7 @@ import "time"
 
 type LinkCreateDTO struct {
 	Link struct {
-		URL       string     `json:"url" required:"true"`
+		URL       string     `json:"url"`
 		ExpiresAt *time.Time `json:"expires_at"`
-	} `json:"link" required:"true"`
+	} `json:"link"`
 }

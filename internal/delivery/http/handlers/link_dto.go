@@ -7,15 +7,15 @@ import (
 )
 
 type LinkDTO struct {
-	ID        int64      `json:"id" required:"true"`
-	Code      string     `json:"code" required:"true"`
-	URL       string     `json:"url" required:"true"`
-	CreatedAt *time.Time `json:"created_at" required:"true"`
+	ID        int64      `json:"id"`
+	Code      string     `json:"code"`
+	URL       string     `json:"url"`
+	CreatedAt *time.Time `json:"created_at"`
 	ExpiresAt *time.Time `json:"expires_at"`
 }
 
 type LinkCreatedDTO struct {
-	Link LinkDTO `json:"link" required:"true"`
+	Link LinkDTO `json:"link"`
 }
 
 func NewLinkCreatedDTO(link *domain.Link) *LinkCreatedDTO {
