@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
-	"math/rand"
-	"strings"
+	"crypto/rand"
+	"math/big"
 	"time"
 
 	"github.com/erazorrr/go-link-shortener/internal/domain"
@@ -21,17 +21,21 @@ func NewLinkCommandService(linkRepository linkRepository) *LinkCommandService {
 	return &LinkCommandService{linkRepository: linkRepository}
 }
 
-const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-const codeLength = 10
+const (
+	codeLength = 10
+	charset    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+)
 
 func randomCode() string {
-	b := make([]byte, codeLength)
-	for i := range b {
-		b[i] = charset[rand.Intn(len(charset))]
+	result := make([]byte, codeLength)
+	for i := range codeLength {
+		index, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		if err != nil {
+			panic(err)
+		}
+		result[i] = charset[int(index.Int64())]
 	}
-	var sb strings.Builder
-	sb.Write(b)
-	return sb.String()
+	return string(result)
 }
 
 func (service *LinkCommandService) CreateLink(ctx context.Context, url string, expiresAt time.Time) (*domain.Link, error) {
