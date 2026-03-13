@@ -33,5 +33,8 @@ func main() {
 
 	addr := fmt.Sprintf("%s:%s", os.Getenv("ADDR"), os.Getenv("PORT"))
 	log.Printf("Started listening on %s\n", addr)
-	http.ListenAndServe(addr, router)
+	err = http.ListenAndServe(addr, router)
+	if err != nil && err != http.ErrServerClosed {
+		log.Fatalf("unable to listen and serve: %v", err)
+	}
 }
