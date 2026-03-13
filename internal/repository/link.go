@@ -20,9 +20,9 @@ const createLinkQuery = `
 	(code, url, expires_at)
 	VALUES
 	($1, $2, $3)
-	RETURNING id
+	RETURNING id, created_at
 `
 
 func (repository *LinkRepository) CreateLink(ctx context.Context, link *domain.Link) error {
-	return repository.dbPool.QueryRow(ctx, createLinkQuery, link.Code, link.Url, link.ExpiresAt).Scan(&link.Id)
+	return repository.dbPool.QueryRow(ctx, createLinkQuery, link.Code, link.Url, link.ExpiresAt).Scan(&link.Id, &link.CreatedAt)
 }
