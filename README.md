@@ -1,7 +1,7 @@
 # Link shortener
 
 ## DevEnv quickstart
-1. Make sure [golang-migrate](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate) are installed
+1. Make sure [golang-migrate](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate) is installed
 2. Make sure docker is installed and running
 3. Set up `.env` file - copy from `.env.example` and fill in missing values
 4. `docker compose up -d`
