@@ -6,14 +6,16 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	linkHandler "github.com/erazorrr/go-link-shortener/internal/delivery/http/handlers/link"
 	"github.com/erazorrr/go-link-shortener/internal/delivery/http/routes"
-	"github.com/erazorrr/go-link-shortener/internal/repository"
+	linkRepository "github.com/erazorrr/go-link-shortener/internal/repository/link"
 	linkService "github.com/erazorrr/go-link-shortener/internal/usecase/link"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -23,7 +25,22 @@ func main() {
 	}
 	defer dbPool.Close()
 
-	linksRepository := repository.NewLinkRepository(dbPool)
+	opts, err := redis.ParseURL(os.Getenv("CACHE_URL"))
+	if err != nil {
+		log.Fatalf("unable to connect to cache: %v", err)
+	}
+	rdb := redis.NewClient(opts)
+
+	maxConcurrentCacheWrites, err := strconv.Atoi(os.Getenv("MAX_CONCURRENT_CACHE_WRITES"))
+	if err != nil || maxConcurrentCacheWrites < 1 {
+		log.Printf("could not parse MAX_CONCURRENT_CACHE_WRITES, using 100 by default")
+		maxConcurrentCacheWrites = 100
+	}
+	linksRepository := linkRepository.NewCachedDBLinkRepository(
+		linkRepository.NewDBLinkRepository(dbPool),
+		linkRepository.NewCacheLinkRepository(rdb),
+		maxConcurrentCacheWrites,
+	)
 	linksQueryService := linkService.NewLinkQueryService(linksRepository)
 	linksCommandService := linkService.NewLinkCommandService(linksRepository)
 

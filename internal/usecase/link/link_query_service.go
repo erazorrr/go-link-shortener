@@ -13,9 +13,9 @@ func NewLinkQueryService(linkRepository linkRepository) *LinkQueryService {
 }
 
 func (linkQueryService *LinkQueryService) GetLinkURL(ctx context.Context, code string) (string, error) {
-	URL, err := linkQueryService.linkRepository.GetLinkURLByCode(ctx, code)
+	url, err := linkQueryService.linkRepository.GetLinkURLByCode(ctx, code)
 	if err != nil {
 		return "", err
 	}
-	return URL, nil
+	return url, nil
 }

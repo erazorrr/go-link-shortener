@@ -1,7 +1,6 @@
 package link
 
 import (
-	"bytes"
 	"encoding/json"
 	"net/http"
 )
@@ -24,15 +23,8 @@ func (handler *LinkHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var buf bytes.Buffer
-	response := NewLinkCreatedDTO(link)
-	err = json.NewEncoder(&buf).Encode(response)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	w.Write(buf.Bytes())
+	response := NewLinkCreatedDTO(link)
+	json.NewEncoder(w).Encode(response)
 }

@@ -1,4 +1,4 @@
-package repository
+package link
 
 import (
 	"context"
@@ -9,12 +9,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type LinkRepository struct {
+type DBLinkRepository struct {
 	dbPool *pgxpool.Pool
 }
 
-func NewLinkRepository(dbPool *pgxpool.Pool) *LinkRepository {
-	return &LinkRepository{dbPool: dbPool}
+func NewDBLinkRepository(dbPool *pgxpool.Pool) *DBLinkRepository {
+	return &DBLinkRepository{dbPool: dbPool}
 }
 
 const createLinkQuery = `
@@ -25,7 +25,7 @@ const createLinkQuery = `
 	RETURNING id, created_at
 `
 
-func (repository *LinkRepository) CreateLink(ctx context.Context, link *domain.Link) error {
+func (repository *DBLinkRepository) CreateLink(ctx context.Context, link *domain.Link) error {
 	return repository.dbPool.QueryRow(ctx, createLinkQuery, link.Code, link.URL, link.ExpiresAt).Scan(&link.ID, &link.CreatedAt)
 }
 
@@ -36,14 +36,14 @@ const findLinkByCodeQuery = `
 	code = $1
 `
 
-func (repository *LinkRepository) GetLinkURLByCode(ctx context.Context, code string) (string, error) {
-	var URL string
-	err := repository.dbPool.QueryRow(ctx, findLinkByCodeQuery, code).Scan(&URL)
+func (repository *DBLinkRepository) GetLinkURLByCode(ctx context.Context, code string) (string, error) {
+	var url string
+	err := repository.dbPool.QueryRow(ctx, findLinkByCodeQuery, code).Scan(&url)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return "", domain.ErrNotFound
 		}
 		return "", err
 	}
-	return URL, nil
+	return url, nil
 }
