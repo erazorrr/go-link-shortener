@@ -20,7 +20,7 @@ func (handler *LinkHandler) Redirect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Del("Content-Type")
+	w.Header().Set("Location", url)
 	w.Header().Add("Cache-Control", "public, max-age=3600")
-	http.Redirect(w, r, url, http.StatusFound)
+	w.WriteHeader(http.StatusFound)
 }
