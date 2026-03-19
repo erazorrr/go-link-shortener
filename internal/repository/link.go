@@ -2,8 +2,10 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/erazorrr/go-link-shortener/internal/domain"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -25,4 +27,23 @@ const createLinkQuery = `
 
 func (repository *LinkRepository) CreateLink(ctx context.Context, link *domain.Link) error {
 	return repository.dbPool.QueryRow(ctx, createLinkQuery, link.Code, link.URL, link.ExpiresAt).Scan(&link.ID, &link.CreatedAt)
+}
+
+const findLinkByCodeQuery = `
+	SELECT url
+	FROM link
+	WHERE
+	code = $1
+`
+
+func (repository *LinkRepository) GetLinkURLByCode(ctx context.Context, code string) (string, error) {
+	var URL string
+	err := repository.dbPool.QueryRow(ctx, findLinkByCodeQuery, code).Scan(&URL)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return "", domain.ErrNotFound
+		}
+		return "", err
+	}
+	return URL, nil
 }

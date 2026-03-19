@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type Link struct {
 	ID        int64
@@ -9,3 +12,5 @@ type Link struct {
 	CreatedAt *time.Time
 	ExpiresAt *time.Time
 }
+
+var ErrNotFound = errors.New("not found")

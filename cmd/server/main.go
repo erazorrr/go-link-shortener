@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/erazorrr/go-link-shortener/internal/delivery/http/handlers"
+	linkHandler "github.com/erazorrr/go-link-shortener/internal/delivery/http/handlers/link"
 	"github.com/erazorrr/go-link-shortener/internal/delivery/http/routes"
 	"github.com/erazorrr/go-link-shortener/internal/repository"
-	"github.com/erazorrr/go-link-shortener/internal/usecase"
+	linkService "github.com/erazorrr/go-link-shortener/internal/usecase/link"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -24,12 +24,15 @@ func main() {
 	defer dbPool.Close()
 
 	linksRepository := repository.NewLinkRepository(dbPool)
-	linksCommandService := usecase.NewLinkCommandService(linksRepository)
+	linksQueryService := linkService.NewLinkQueryService(linksRepository)
+	linksCommandService := linkService.NewLinkCommandService(linksRepository)
 
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 
-	routes.RegisterLinkRoutes(router, handlers.NewLinkHandler(linksCommandService))
+	linkHandler := linkHandler.NewLinkHandler(linksQueryService, linksCommandService)
+	routes.RegisterLinkRoutes(router, linkHandler)
+	routes.RegisterRedirectRoute(router, linkHandler)
 
 	addr := fmt.Sprintf("%s:%s", os.Getenv("ADDR"), os.Getenv("PORT"))
 	log.Printf("Started listening on %s\n", addr)

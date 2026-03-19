@@ -1,20 +1,10 @@
-package handlers
+package link
 
 import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-
-	"github.com/erazorrr/go-link-shortener/internal/usecase"
 )
-
-type LinkHandler struct {
-	linkCommandService *usecase.LinkCommandService
-}
-
-func NewLinkHandler(linkCommandService *usecase.LinkCommandService) *LinkHandler {
-	return &LinkHandler{linkCommandService: linkCommandService}
-}
 
 const maxRequestBodySizeBytes = 1 << 20
 

@@ -1,4 +1,4 @@
-package usecase
+package link
 
 import (
 	"context"
@@ -8,10 +8,6 @@ import (
 
 	"github.com/erazorrr/go-link-shortener/internal/domain"
 )
-
-type linkRepository interface {
-	CreateLink(context.Context, *domain.Link) error
-}
 
 type LinkCommandService struct {
 	linkRepository linkRepository
