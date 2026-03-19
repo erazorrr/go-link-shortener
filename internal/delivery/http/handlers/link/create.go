@@ -3,6 +3,7 @@ package link
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 )
 
 const maxRequestBodySizeBytes = 1 << 20
@@ -14,6 +15,10 @@ func (handler *LinkHandler) Create(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if body.Link.ExpiresAt != nil && body.Link.ExpiresAt.Before(time.Now()) {
+		http.Error(w, "expires_at must be in the future", http.StatusBadRequest)
 		return
 	}
 

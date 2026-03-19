@@ -6,6 +6,8 @@ services:
       - ADDR=0.0.0.0
       - DB_URL=postgres://${DB_USERNAME}:${DB_PASSWORD}@db:5432/${DB_NAME}
       - CACHE_URL=redis://default:${CACHE_PASSWORD}@cache:6379/${CACHE_DB_NO}
+      - MAX_CONCURRENT_CACHE_WRITES=100
+      - INTERNAL_API_KEY=${INTERNAL_API_KEY}
     ports:
       - "${PORT}:80"
     depends_on:

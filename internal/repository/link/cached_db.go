@@ -27,7 +27,7 @@ func (repository *CachedDBLinkRepository) CreateLink(ctx context.Context, link *
 	if err != nil {
 		return err
 	}
-	return repository.cacheRepository.SaveLinkMapping(ctx, link.Code, link.URL)
+	return repository.cacheRepository.SaveLinkMapping(ctx, link.Code, link.URL, link.ExpiresAt)
 }
 
 func (repository *CachedDBLinkRepository) GetLinkURLByCode(ctx context.Context, code string) (string, error) {
@@ -36,7 +36,7 @@ func (repository *CachedDBLinkRepository) GetLinkURLByCode(ctx context.Context, 
 		return URL, nil
 	}
 
-	URL, err = repository.dbRepository.GetLinkURLByCode(ctx, code)
+	link, err := repository.dbRepository.GetLinkByCode(ctx, code)
 	if err != nil {
 		return "", err
 	}
@@ -45,10 +45,10 @@ func (repository *CachedDBLinkRepository) GetLinkURLByCode(ctx context.Context, 
 	case repository.cacheTokens <- struct{}{}:
 		go func() {
 			defer func() { <-repository.cacheTokens }()
-			repository.cacheRepository.SaveLinkMapping(context.Background(), code, URL)
+			repository.cacheRepository.SaveLinkMapping(context.Background(), code, link.URL, link.ExpiresAt)
 		}()
 	default:
 	}
 
-	return URL, nil
+	return link.URL, nil
 }

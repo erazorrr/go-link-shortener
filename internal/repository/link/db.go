@@ -30,20 +30,33 @@ func (repository *DBLinkRepository) CreateLink(ctx context.Context, link *domain
 }
 
 const findLinkByCodeQuery = `
-	SELECT url
+	SELECT id, url, expires_at, created_at
 	FROM link
 	WHERE
 	code = $1
+	AND (expires_at IS NULL OR expires_at > now())
 `
 
-func (repository *DBLinkRepository) GetLinkURLByCode(ctx context.Context, code string) (string, error) {
-	var url string
-	err := repository.dbPool.QueryRow(ctx, findLinkByCodeQuery, code).Scan(&url)
+func (repository *DBLinkRepository) GetLinkByCode(ctx context.Context, code string) (*domain.Link, error) {
+	link := domain.Link{
+		Code: code,
+	}
+	err := repository.dbPool.QueryRow(ctx, findLinkByCodeQuery, code).Scan(&link.ID, &link.URL, &link.ExpiresAt, &link.CreatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return "", domain.ErrNotFound
+			return nil, domain.ErrNotFound
 		}
-		return "", err
+		return nil, err
 	}
-	return url, nil
+	return &link, nil
+}
+
+const deleteExpiredQuery = `
+	DELETE FROM link
+	WHERE expires_at IS NOT NULL AND expires_at <= now()
+`
+
+func (repository *DBLinkRepository) DeleteExpired(ctx context.Context) error {
+	_, err := repository.dbPool.Exec(ctx, deleteExpiredQuery)
+	return err
 }

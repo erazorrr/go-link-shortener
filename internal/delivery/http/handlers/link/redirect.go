@@ -20,5 +20,5 @@ func (handler *LinkHandler) Redirect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	http.Redirect(w, r, url, http.StatusFound)
 }

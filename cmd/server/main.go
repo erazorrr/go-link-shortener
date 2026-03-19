@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/erazorrr/go-link-shortener/internal/delivery/http/handlers/cleanup"
 	linkHandler "github.com/erazorrr/go-link-shortener/internal/delivery/http/handlers/link"
 	"github.com/erazorrr/go-link-shortener/internal/delivery/http/routes"
 	linkRepository "github.com/erazorrr/go-link-shortener/internal/repository/link"
@@ -19,6 +20,11 @@ import (
 )
 
 func main() {
+	internalApiKey := os.Getenv("INTERNAL_API_KEY")
+	if internalApiKey == "" {
+		log.Fatal("INTERNAL_API_KEY env variable not specified")
+	}
+
 	dbPool, err := pgxpool.New(context.Background(), os.Getenv("DB_URL"))
 	if err != nil {
 		log.Fatalf("unable to create dbpool: %v", err)
@@ -36,16 +42,21 @@ func main() {
 		log.Printf("could not parse MAX_CONCURRENT_CACHE_WRITES, using 100 by default")
 		maxConcurrentCacheWrites = 100
 	}
+	linksDBRepository := linkRepository.NewDBLinkRepository(dbPool)
 	linksRepository := linkRepository.NewCachedDBLinkRepository(
-		linkRepository.NewDBLinkRepository(dbPool),
+		linksDBRepository,
 		linkRepository.NewCacheLinkRepository(rdb),
 		maxConcurrentCacheWrites,
 	)
 	linksQueryService := linkService.NewLinkQueryService(linksRepository)
 	linksCommandService := linkService.NewLinkCommandService(linksRepository)
+	linksCleanupService := linkService.NewLinkCleanupService(linksDBRepository)
 
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
+
+	cleanupHandler := cleanup.NewCleanupHandler(linksCleanupService)
+	routes.RegisterCleanupRoutes(router, internalApiKey, cleanupHandler)
 
 	linkHandler := linkHandler.NewLinkHandler(linksQueryService, linksCommandService)
 	routes.RegisterLinkRoutes(router, linkHandler)
